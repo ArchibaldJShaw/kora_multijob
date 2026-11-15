@@ -174,7 +174,7 @@ local function openMenu()
         appActive = false
 
         if not ok then
-            print(('^1[kora_multijob]^7 Could not open the job roster: %s'):format(tostring(err)))
+            Kora.logging.error('roster.open_failed', 'Could not open the job roster', { error = tostring(err) })
             Kora.notify.send({
                 title = Kora.lang('title'),
                 type = 'error',

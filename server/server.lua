@@ -5,17 +5,17 @@ local schemaReady = false
 CreateThread(function()
     local ready = Kora.sql.ready(60000)
     if not ready then
-        print('^1[kora_multijob]^7 kora_sql was not ready; multi-job persistence is unavailable.')
+        Kora.logging.error('schema.sql_unavailable', 'kora_sql was not ready; multi-job persistence is unavailable')
         return
     end
     local reports, err = Kora.sql.ensureTables(KoraMultijobSchema)
     if err then
-        print(('^1[kora_multijob]^7 schema setup failed: %s'):format(err))
+        Kora.logging.error('schema.setup_failed', 'Multijob schema setup failed', { error = tostring(err) })
         return
     end
     for _, report in ipairs(reports or {}) do
         for _, warning in ipairs(report.warnings or {}) do
-            print(('^3[kora_multijob]^7 schema warning: %s'):format(tostring(warning)))
+            Kora.logging.warn('schema.warning', 'Multijob schema warning', { warning = tostring(warning) })
         end
     end
     schemaReady = true
@@ -403,7 +403,7 @@ end)
 AddEventHandler('QBCore:Server:OnJobUpdate', function(src)
     local ok, err = saveActiveJob(src)
     if not ok and err ~= 'job storage is still starting' and err ~= 'character or job is unavailable' then
-        print(('^1[kora_multijob]^7 could not save job roster for %s: %s'):format(tostring(src), err))
+        Kora.logging.error('roster.save_failed', 'Could not save job roster', { playerId = src, error = tostring(err) })
     end
 end)
 AddEventHandler('playerDropped', function() invalidate(tonumber(source)) end)
