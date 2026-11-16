@@ -20,7 +20,8 @@ All options live in `config.lua`. The values are also registered with `kora_lib`
 For a job listed in `Config.disabledDuty`:
 
 - the client does not show the duty button and shows "Duty: Managed by job" on the active job card;
-- the server callback `kora_multijob:server:toggleDuty` also refuses ("duty changes are disabled for this job").
+- the server callback `kora_multijob:server:toggleDuty` also refuses ("duty changes are disabled for this job");
+- the `setDuty` export refuses with `duty_change_disabled`.
 
 Only `disabledDuty.police` is registered with `Kora.config` as an editable option. Other job names added to the table in `config.lua` are still honoured by the code.
 

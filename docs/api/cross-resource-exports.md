@@ -22,7 +22,7 @@ Namespace: `exports.kora_multijob` · Source: `server.lua`
 
 ## Functions
 
-6 server exports.
+7 server exports.
 
 ### `exports.kora_multijob:addJob(src, name, level)`
 
@@ -77,6 +77,31 @@ local roster = exports.kora_multijob:getRoster(source)
 
 ```text
 Equivalent to triggering the callback, without the client round trip.
+```
+
+### `exports.kora_multijob:setDuty(src, onDuty)`
+
+Sets the on/off duty state of the player's CURRENT active job, using the same rules as the roster panel's duty button. The job is read from `kora_core` on the server (callers never supply it), jobs listed in `Config.disabledDuty` are refused, and `exports.kora_core:setJobDuty` applies the change. It does not yield beyond that call and has no side effects when it refuses.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `src` | integer | Online player source. |
+| `onDuty` | boolean | The duty state to set. Anything other than a boolean is refused. |
+
+**Returns**
+
+- **`true`** when the duty state was applied.
+- **`false, reason`** otherwise. `reason` is one of `invalid_duty`, `character_not_loaded`, `duty_change_disabled` (the active job is in `Config.disabledDuty`) or `duty_change_failed` (`kora_core` refused).
+
+**Example**
+
+```lua
+local ok, reason = exports.kora_multijob:setDuty(source, true)
+if not ok then
+    Kora.logging.warn('duty.refused', 'Duty change refused', { reason = reason })
+end
 ```
 
 ### `exports.kora_multijob:getEmployees(jobName)`

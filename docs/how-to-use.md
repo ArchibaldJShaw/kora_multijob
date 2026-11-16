@@ -43,7 +43,7 @@ Kora.callback.register('kora_multijob:server:quitJob', function(src, name) ... e
 ```
 
 - `selectJob(src, name)` — the job must already be in the caller's roster; on success it calls `exports.kora_core:setJob(src, name, record.level)`.
-- `toggleDuty(src)` — flips the CURRENT active job's duty via `exports.kora_core:setJobDuty`, refused outright with `'duty changes are disabled for this job'` when `Config.disabledDuty[job.name]` is `true` (default: `police`).
+- `toggleDuty(src)` — flips the CURRENT active job's duty through the same helper as the `exports.kora_multijob:setDuty(src, onDuty)` export (which other resources call to set an explicit state), ending in `exports.kora_core:setJobDuty`, refused outright with `'duty changes are disabled for this job'` when `Config.disabledDuty[job.name]` is `true` (default: `police`).
 - `quitJob(src, name)` — removes a saved job from the roster. Refused for `'unemployed'`, for a job not in the roster, and for whichever job is currently active (`'choose another active job before removing this one'`) — a player can never quit the job kora_core currently has them working.
 
 ## Admin commands: /givejob and /removejob
