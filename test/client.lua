@@ -5,6 +5,7 @@ local results = {}
 _G.RegisterCommand = function(name, handler) commands[name] = handler end
 _G.RegisterKeyMapping = function() end
 _G.CreateThread = function(handler) handler() end
+_G.RegisterNetEvent = function() end
 
 local initial = {
     active = { name = 'ambulance', onDuty = false },
@@ -30,6 +31,10 @@ local onDuty = {
 }
 
 _G.Kora = {
+    lang = function(key, ...)
+        local text = dofile(root .. 'locales/en.lua')[key] or key
+        return select('#', ...) > 0 and text:format(...) or text
+    end,
     notify = { send = function() end },
     callback = { trigger = function(name, value)
         calls[#calls + 1] = { name = name, value = value }
@@ -49,8 +54,8 @@ _G.Kora = {
     },
 }
 
-dofile(root .. 'config.lua')
-dofile(root .. 'client.lua')
+dofile(root .. 'shared/config.lua')
+dofile(root .. 'client/client.lua')
 
 local passed = 0
 local function equal(actual, expected, message)
@@ -97,7 +102,7 @@ truthy(results.duty.update.navigation, 'duty returns a live AppShell update')
 equal(#results.quit.update.navigation[1].content.blocks, 1, 'the empty saved-jobs section is omitted')
 equal(results.quit.update.description, '1 of 5 jobs saved', 'live updates refresh roster capacity')
 
-local clientFile = assert(io.open(root .. 'client.lua', 'r'))
+local clientFile = assert(io.open(root .. 'client/client.lua', 'r'))
 local clientSource = clientFile:read('*a')
 clientFile:close()
 truthy(not clientSource:find('Kora.nui.isAppOpen', 1, true),
