@@ -179,13 +179,29 @@ Kora.callback.register('kora_multijob:server:selectJob', function(src, name)
     return false, 'active_job_set_failed'
 end)
 
-Kora.callback.register('kora_multijob:server:toggleDuty', function(src)
+---Sets the caller's active-job duty state. The single rule set behind the roster duty button and the
+---`setDuty` export: the job is read from kora_core (never from the caller), jobs in `Config.disabledDuty`
+---are refused, and kora_core's `setJobDuty` applies the change.
+---@param src integer
+---@param onDuty boolean
+---@return boolean ok
+---@return string? reason 'invalid_duty', 'character_not_loaded', 'duty_change_disabled' or 'duty_change_failed'
+local function setDuty(src, onDuty)
+    if type(onDuty) ~= 'boolean' then return false, 'invalid_duty' end
     local data = player(src)
     local job = data and data.job
     if not job then return false, 'character_not_loaded' end
     if Config.disabledDuty[job.name] then return false, 'duty_change_disabled' end
-    local ok, err = exports.kora_core:setJobDuty(src, not job.onduty)
-    if not ok then return false, 'duty_change_failed' end
+    if not exports.kora_core:setJobDuty(src, onDuty) then return false, 'duty_change_failed' end
+    return true
+end
+
+Kora.callback.register('kora_multijob:server:toggleDuty', function(src)
+    local data = player(src)
+    local job = data and data.job
+    if not job then return false, 'character_not_loaded' end
+    local ok, reason = setDuty(src, not job.onduty)
+    if not ok then return false, reason end
     return true, view(src)
 end)
 
@@ -414,6 +430,7 @@ end)
 
 exports('addJob', addJob)
 exports('getRoster', view)
+exports('setDuty', setDuty)
 exports('getEmployees', getEmployees)
 exports('setEmployeeJob', setEmployeeJob)
 exports('removeEmployeeJob', removeEmployeeJob)
